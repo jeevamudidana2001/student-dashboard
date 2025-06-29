@@ -1,20 +1,14 @@
-<!-- login.html -->
 <!DOCTYPE html>
 <html>
 <head>
   <title>Admin Login</title>
-  <style>
-    body { font-family: Arial; text-align: center; padding: 50px; }
-    input { padding: 8px; margin: 10px; width: 200px; }
-    button { padding: 8px 16px; }
-    #status { color: red; margin-top: 10px; }
-  </style>
 </head>
 <body>
-  <h2>🔐 Admin Login</h2>
-  <input type="text" id="username" placeholder="Username"><br>
-  <input type="password" id="password" placeholder="Password"><br>
+  <h2>Admin Login</h2>
+  <input type="text" id="username" placeholder="Username">
+  <input type="password" id="password" placeholder="Password">
   <button onclick="login()">Login</button>
+
   <p id="status"></p>
 
   <script>
@@ -22,26 +16,13 @@
       const username = document.getElementById("username").value;
       const password = document.getElementById("password").value;
 
-      fetch("https://principal-student-2.onrender.com/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ username, password })
-      })
-      .then(res => res.json())
-      .then(data => {
-        if (data.success) {
-          // ✅ Set login flag and redirect
-          localStorage.setItem("adminLoggedIn", "true");
-          window.location.href = "dashboard.html";
-        } else {
-          document.getElementById("status").innerText = data.error;
-        }
-      })
-      .catch(() => {
-        document.getElementById("status").innerText = "Login failed.";
-      });
+      if (username === "admin" && password === "admin123") {
+        localStorage.setItem("isLoggedIn", true);
+        window.location.href = "index.html";  // ✅ Redirect to dashboard
+      } else {
+        document.getElementById("status").innerText = "❌ Invalid credentials";
+      }
     }
   </script>
 </body>
 </html>
-
