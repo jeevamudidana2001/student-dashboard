@@ -10,10 +10,17 @@
     th, td { padding: 10px; border: 1px solid #ccc; text-align: left; }
     th { background-color: #f0f0f0; }
     #registerStatus { margin-top: 10px; font-weight: bold; }
-    #logoutBtn { float: right; margin-top: -50px; background-color: #f44336; color: white; border: none; padding: 8px 16px; }
+    #logoutBtn { float: right; margin-top: -50px; background-color: #f44336; color: white; border: none; }
   </style>
 </head>
 <body>
+
+  <!-- 🔐 Redirect if not logged in -->
+  <script>
+    if (!localStorage.getItem("isLoggedIn")) {
+      window.location.href = "login.html";
+    }
+  </script>
 
   <button id="logoutBtn" onclick="logout()">Logout</button>
 
@@ -33,51 +40,41 @@
       <th>Action</th>
     </tr>
   </table>
-  // ✅ Add this at the top of <script> block in index.html
-
-if (!localStorage.getItem("isLoggedIn")) {
-  window.location.href = "login.html";  // 🔐 Redirect to login
-}
 
   <script>
     const apiBase = "https://principal-student-2.onrender.com";
     let isEditMode = false;
     let oldRollValue = "";
 
-    // 🔐 Protect page from direct access
-    if (!localStorage.getItem("isLoggedIn")) {
-      window.location.href = "login.html";
-    }
-
-    // 🧠 Logout
     function logout() {
       localStorage.removeItem("isLoggedIn");
       window.location.href = "login.html";
     }
 
-    // 📥 Fetch students from backend
     function fetchStudents() {
       fetch(`${apiBase}/students`)
         .then(res => res.json())
         .then(data => {
           const table = document.getElementById("studentTable");
-          table.innerHTML = "<tr><th>Name</th><th>Roll Number</th><th>Registered At</th><th>Action</th></tr>";
+
+          // Clear old rows except header
+          while (table.rows.length > 1) {
+            table.deleteRow(1);
+          }
+
           data.forEach(student => {
             const row = table.insertRow();
-            row.innerHTML = `
-              <td>${student.name}</td>
-              <td>${student.roll}</td>
-              <td>${student.timestamp || "-"}</td>
-              <td>
-                <button onclick="editStudent('${student.name}', '${student.roll}')">✏️ Edit</button>
-                <button onclick="deleteStudent('${student.roll}')">🗑️ Delete</button>
-              </td>
+            row.insertCell(0).innerText = student.name;
+            row.insertCell(1).innerText = student.roll;
+            row.insertCell(2).innerText = student.timestamp || "-";
+            row.insertCell(3).innerHTML = `
+              <button onclick="editStudent('${student.name}', '${student.roll}')">✏️ Edit</button>
+              <button onclick="deleteStudent('${student.roll}')">🗑️ Delete</button>
             `;
           });
         });
     }
 
-    // 📤 Register or Update student
     function submitForm() {
       const name = document.getElementById("name").value.trim();
       const roll = document.getElementById("roll").value.trim();
@@ -118,7 +115,6 @@ if (!localStorage.getItem("isLoggedIn")) {
       }
     }
 
-    // ✏️ Edit
     function editStudent(name, roll) {
       isEditMode = true;
       oldRollValue = roll;
@@ -143,7 +139,6 @@ if (!localStorage.getItem("isLoggedIn")) {
       document.getElementById("cancelBtn").style.display = "none";
     }
 
-    // ❌ Delete
     function deleteStudent(roll) {
       if (!confirm("Are you sure you want to delete this student?")) return;
       fetch(`${apiBase}/delete/${roll}`, {
@@ -156,8 +151,9 @@ if (!localStorage.getItem("isLoggedIn")) {
       });
     }
 
-    // ⏬ Fetch on page load
+    // Load students on page load
     window.onload = fetchStudents;
   </script>
+
 </body>
 </html>
