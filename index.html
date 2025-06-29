@@ -33,6 +33,11 @@
       <th>Action</th>
     </tr>
   </table>
+  // ✅ Add this at the top of <script> block in index.html
+
+if (!localStorage.getItem("isLoggedIn")) {
+  window.location.href = "login.html";  // 🔐 Redirect to login
+}
 
   <script>
     const apiBase = "https://principal-student-2.onrender.com";
